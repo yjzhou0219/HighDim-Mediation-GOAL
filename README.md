@@ -16,7 +16,7 @@ You can copy and run the following R script to install all dependencies (includi
 if (!require("devtools")) install.packages("devtools")
 
 # 2. Install standard CRAN packages
-packages <- c("MASS", "glmnet", "mediation", "dplyr") # Add any other CRAN packages you use
+packages <- c("stats", "MASS", "glmnet", "car", "lqa", "dplyr") # Add any other CRAN packages you use
 install.packages(packages[!packages %in% installed.packages()])
 
 # 3. Install specific packages from GitHub
