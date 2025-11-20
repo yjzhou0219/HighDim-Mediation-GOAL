@@ -29,13 +29,11 @@ install_github("JeffreyRacine/R-Package-np")
 
 ## Repository Structure
 
-The repository is organized as follows:
-* **`R/`**: This folder contains the main simulation script and the source code for the proposed method.
-    * `GOAL_deviance.R`: Contains the function for the deviance-determined generalized outcome-adaptive Lasso (GOAL) variable selection algorithm.
-    * `mediation_effect_continuous.R`: Contains the three functions for the IPW-based semi-parametric estimator for continuous exposures and mediators.
-    * `simulation.R`: The main script to reproduce the simulation studies. It calls the necessary functions from the aforementioned files.
-* **`LICENSE`**: The license agreement for using the code.
-* **`README.md`**: Project documentation and instructions.
+All source code for the proposed method and simulation studies is located in the **`R/`** directory:
+* **`GOAL_deviance.R`**: Contains the implementation of the Generalized Outcome-Adaptive Lasso (GOAL) algorithm for high-dimensional variable selection.
+* **`mediation_effect_continuous.R`**: Contains the core function for the IPW-based semi-parametric estimator, specifically designed for continuous exposures and mediators.
+* **`simulation.R`**: The main script to reproduce the simulation studies. It demonstrates how to generate data and apply the proposed estimator by calling the necessary functions from the aforementioned files.
+
 
 
 ## How to Run
