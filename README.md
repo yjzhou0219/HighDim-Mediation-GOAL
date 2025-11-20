@@ -1,6 +1,6 @@
 # High-Dimensional Causal Mediation Analysis with GOAL
 
-This repository contains the R code and simulation scripts for the paper **"Variable selection-combined causal mediation analysis for continuous treatments with application to high-dimensional biomedical data"**.
+This repository contains the R code and simulation scripts for the paper **"Variable selection-combined causal mediation analysis for continuous treatments with application to high-dimensional biomedical data" (Yajing Zhou, et al.)**.
 
 We implement a novel method that integrates Generalized Outcome-Adaptive Lasso (GOAL) with an IPW-based semi-parametric mediation estimator. This approach is specifically designed to estimate causal mediation effects for continuous exposures and mediators in the presence of high-dimensional covariates.
 
