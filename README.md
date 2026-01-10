@@ -19,6 +19,8 @@ if (!require("devtools")) install.packages("devtools")
 packages <- c("stats", "MASS", "glmnet", "car", "lqa", "dplyr") # Add any other CRAN packages you use
 install.packages(packages[!packages %in% installed.packages()])
 
+*Note on R Version: This project was developed and successfully tested under R version 4.4.2. If you encounter compilation issues during lqa installation (especially on macOS or Linux), ensure you have the appropriate build tools installed (e.g., RTools on Windows, Xcode on macOS).
+
 # 3. Install specific packages from GitHub
 library(devtools)
 # Please ensure you have internet access for this step
