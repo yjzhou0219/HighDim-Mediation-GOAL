@@ -7,7 +7,7 @@ We implement a novel method that integrates Generalized Outcome-Adaptive Lasso (
 
 ## Prerequisites
 
-The source code was developed and successfully executed under R version 4.4.2 (2024-10-31). To ensure full reproducibility of the results, we provide two methods for environment setup.
+The source code was developed and successfully executed under R version 4.4.2 . To ensure full reproducibility of the results, we provide two methods for environment setup.
 
 
 ### Method 1: Manual Setup (Recommended for R 4.4.2 or earlier)
@@ -62,7 +62,7 @@ renv::restore()
 
 
 
-#### **Note on 'lqa' package**: 
+#### **Note on `lqa` package**: 
 The `lqa` package is required for GOAL but may **not be** directly available via `install.packages("lqa")` in recent versions of R. We have included the source file `lqa_1.0-3.tar.gz` in `renv/local/` of this repository. 
 
 - If you are using Method 1 (Manual Setup), the `lqa` can be directly installed by setp 4:
