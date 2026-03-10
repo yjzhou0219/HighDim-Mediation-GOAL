@@ -11,7 +11,6 @@ The source code was developed and successfully executed under R version 4.4.2 (2
 
 
 ### Method 1: Manual Setup (Recommended for R 4.4.2 or earlier)
-If you prefer to set up the environment manually, please ensure you are using R version 4.4.2.
 
 If you prefer to set up the environment manually, please ensure you are using R version 4.4.2 (2024-10-31) or an earlier version to maintain compatibility with all dependencies.
 
@@ -29,15 +28,11 @@ library(devtools)
 # Please ensure you have internet access for this step
 install_github("strengejacke/sjstats")
 install_github("JeffreyRacine/R-Package-np")
+
+# 4. Install 'lqa' from the provided local source file
+install.packages("renv/local/lqa_1.0-3.tar.gz", repos = NULL, type = "source")
+
 ```
-
-**Note on 'lqa' package**: Since `lqa` is required for GOAL but may **not be** directly available via `install.packages("lqa")`, you can install it using one of the following options:
-
-- Option A: Download the source file `lqa_1.0-3.tar.gz` from the CRAN Archive (https://cran.r-project.org/src/contrib/Archive/lqa/).
-
-- Option B: Use the provided source file in the `R/renv/local` folder of this repository.
-
-
 
 ### Method 2: Using **`renv`** (Automated Environment Recovery)
 This repository includes a `renv` configuration to help you recreate the exact development environment.
@@ -56,6 +51,7 @@ renv::restore()
 ```
 - R should automatically source `renv/activate.R `upon opening the project. If the environment is not automatically activated, manually run the following step:
 
+
 	```r
 	## 2.2 Ativate the environment.
 	source("renv/activate.R")
@@ -63,6 +59,19 @@ renv::restore()
 
 - After running following `renv::restore()` command, all dependencies (including the local `lqa` source package from the `R/renv/local` folder) will be automatically installed.
 - When prompted, confirm the installation. `renv` will synchronize your local library with the `renv.lock` file provided in this repository
+
+
+
+**Note on 'lqa' package**: The `lqa` package is required for GOAL but may **not be** directly available via `install.packages("lqa")` in recent versions of R. We have included the source file `lqa_1.0-3.tar.gz` in `renv/local/` of this repository. 
+
+- If you are using Method 1 (Manual Setup), the `lqa` can be directly installed by setp 4:
+	```r
+	install.packages("renv/local/lqa_1.0-3.tar.gz", repos = NULL, type = "source")
+	```
+
+- If you are using Method 2 (`renv`): No additional action is needed. Run `renv::restore() ` and  `lqa` will be automatically installed from the provided local source file.
+
+
 
 
 
