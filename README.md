@@ -62,7 +62,18 @@ renv::restore()
 
 
 
-**Note on 'lqa' package**: The `lqa` package is required for GOAL but may **not be** directly available via `install.packages("lqa")` in recent versions of R. We have included the source file `lqa_1.0-3.tar.gz` in `renv/local/` of this repository. 
+#### **Note on 'lqa' package**: 
+The `lqa` package is required for GOAL but may **not be** directly available via `install.packages("lqa")` in recent versions of R. We have included the source file `lqa_1.0-3.tar.gz` in `renv/local/` of this repository. 
+
+- If you are using Method 1 (Manual Setup), the `lqa` can be directly installed by setp 4:
+	```r
+	install.packages("renv/local/lqa_1.0-3.tar.gz", repos = NULL, type = "source")
+	```
+
+- If you are using Method 2 (`renv`): No additional action is needed. Run `renv::restore() ` and  `lqa` will be automatically installed from the provided local source file.
+
+
+
 
 - If you are using Method 1 (Manual Setup), the `lqa` can be directly installed by setp 4:
 	```r
