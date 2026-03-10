@@ -23,6 +23,12 @@ if (!require("devtools")) install.packages("devtools")
 # 2. Install standard CRAN packages
 packages <- c("stats", "MASS", "glmnet", "car", "dplyr") # Add any other CRAN packages you use
 install.packages(packages[!packages %in% installed.packages()])
+
+# 3. Install specific packages from GitHub
+library(devtools)
+# Please ensure you have internet access for this step
+install_github("strengejacke/sjstats")
+install_github("JeffreyRacine/R-Package-np")
 ```
 
 **Note on 'lqa' package**: Since `lqa` is required for GOAL but may **not be** directly available via `install.packages("lqa")`, you can install it using one of the following options:
@@ -31,13 +37,6 @@ install.packages(packages[!packages %in% installed.packages()])
 
 - Option B: Use the provided source file in the `R/renv/local` folder of this repository.
 
-```r
-# 3. Install specific packages from GitHub
-library(devtools)
-# Please ensure you have internet access for this step
-install_github("strengejacke/sjstats")
-install_github("JeffreyRacine/R-Package-np")
-```
 
 
 ### Method 2: Using **`renv`** (Automated Environment Recovery)
