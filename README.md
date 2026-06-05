@@ -145,4 +145,3 @@ To replicate the simulation results, please follow these steps:
     source("simulation.R")
     ```
 
-
