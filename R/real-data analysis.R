@@ -1,5 +1,7 @@
 source("GOAL_deviance.R")
 source("mediation_effect_continuous.R")
+source("bandwidth diagnostics.R")
+
 
 library(data.table)
 library(dplyr)
@@ -702,9 +704,9 @@ var.list <- names(Data_realexamp)[1:p]
 
 ## GOAL_deviance
 
-cat(sprintf("########################## 开始循环: %s ## \n", Sys.time()))
+cat(sprintf("########################## cycle starts: %s ## \n", Sys.time()))
 GOAL_deviance_res <- GOAL_deviance(n=n,Data=Data_realexamp,var.list=var.list,lambda_vec=c(-10,-5,-2,-1,-0.75,-0.5,-0.25,0.25,0.49),covar=NULL,gamma_convergence=2) 
-cat(sprintf("## 结束循环: %s ##\n", Sys.time()))
+cat(sprintf("## cycle ends: %s ##\n", Sys.time()))
 Svar_ax_final<- GOAL_deviance_res$GOAL_AX$Svar_ax
 Svar_amx_final<- GOAL_deviance_res$GOAL_AMX$Svar_amx
 
@@ -713,7 +715,9 @@ save(GOAL_deviance_res,file = "GOAL_deviance_res_RE.Rdata")
 
 
 
-## 3 estimation ####
+
+## 3 estimation and diagnosis ####
+
 
 y=as.numeric(Data_realexamp[,"Y"])
 a=as.numeric(Data_realexamp[,"Trt"])
@@ -727,49 +731,85 @@ X_amx <- as.matrix(Data_realexamp[,X_amx_var])
 
 exp_score <- seq(3,13,1) 
 
-cat(sprintf("########################## 开始循环: %s ## \n", Sys.time()))
-cl <- makeCluster(5)
+cat(sprintf("########################## cycle starts: %s ## \n", Sys.time()))
+cl <- makeCluster(detectCores()-2)
 registerDoParallel(cl)
 
 boot_results_a1 <- foreach(j = 1:length(exp_score), .combine = rbind, .packages = c('np')) %dopar% {
   res_list <- medweightcont(y = y, a = a, m = m, x_ax = X_ax, x_amx = X_amx, a0 = 2, a1 = exp_score[j], ATET = FALSE, 
-                            trim = 0.05, lognorm = F, bw = 2.34*(n^(-0.25)), boot = 500, cluster = NULL) 
+                            trim = 0.05, lognorm = F, bw = sd(a)*2.34/(length(a)^0.2), boot = 500, cluster = NULL) 
+  ## estimation
   boot_res_ai <- as.data.frame(res_list$boot_results)
   rownames(boot_res_ai) <- paste(rownames(boot_res_ai), exp_score[j], sep = "_")
   ntrim <- res_list$ntrimmed
-  relative_wgt <- as.data.frame(res_list$relative_wgt)
+  
+  ## diagnosis
+  wgt <- res_list$relative_wgt
+  kwgt <- res_list$kernel_wgt
+  ind <- res_list$ind
+  
+  # ESS ＆ CV
+  ess_a1m1 <- calc_ess_decomp(wgt$relative_wgt_a1m1, kwgt$kernel_wgt_a1)
+  ess_a1m0 <- calc_ess_decomp(wgt$relative_wgt_a1m0, kwgt$kernel_wgt_a1)
+  ess_a0m1 <- calc_ess_decomp(wgt$relative_wgt_a0m1, kwgt$kernel_wgt_a0)
+  ess_a0m0 <- calc_ess_decomp(wgt$relative_wgt_a0m0, kwgt$kernel_wgt_a0)
+  
+  ess_decomp <- t(cbind(ess_a1m1,ess_a1m0,ess_a0m1,ess_a0m0))
+  ess_decomp <- rbind(ess_decomp,colMeans(ess_decomp,na.rm = T))
+  rownames(ess_decomp) <- c(rownames(ess_decomp)[1:4],"mean")
+  rownames(ess_decomp) <- paste(rownames(ess_decomp), exp_score[j], sep = "_")
+  
+  # SMD
+  x_ax_trimmed <- as.data.frame(X_ax[ind, , drop = FALSE])
+  x_amx_trimmed <- as.data.frame(X_amx[ind, , drop = FALSE])
+  x_union <- as.data.frame(cbind(x_ax_trimmed,x_amx_trimmed[, setdiff(colnames(x_amx_trimmed), colnames(x_ax_trimmed)), drop = FALSE]))
+  
+  smd_a1m1 <- calc_smd(x_ax_trimmed, wgt$relative_wgt_a1m1)
+  smd_a0m0 <- calc_smd(x_ax_trimmed, wgt$relative_wgt_a0m0)
+  smd_a1m0 <- calc_smd(x_union, wgt$relative_wgt_a1m0)
+  smd_a0m1 <- calc_smd(x_union, wgt$relative_wgt_a0m1)
+  
+  smd_summary <- data.frame(
+    max_abs_smd = c(
+      max(smd_a1m1, na.rm = TRUE),
+      max(smd_a1m0, na.rm = TRUE),
+      max(smd_a0m1, na.rm = TRUE),
+      max(smd_a0m0, na.rm = TRUE)
+    ),
+    mean_abs_smd = c(
+      mean(smd_a1m1, na.rm = TRUE),
+      mean(smd_a1m0, na.rm = TRUE),
+      mean(smd_a0m1, na.rm = TRUE),
+      mean(smd_a0m0, na.rm = TRUE)
+    )
+  )
+  
+  rownames(smd_summary) <- paste(c("a1m1", "a1m0", "a0m1", "a0m0"), exp_score[j], sep = "_")
+  
+  
   list(
     ntrim=ntrim,
     boot_res_ai=boot_res_ai,
-    relative_wgt_=relative_wgt
+    ess_decomp=ess_decomp,
+    smd_summary=smd_summary
   )
 }
 
 stopCluster(cl)
-cat(sprintf("## 结束循环: %s ##\n", Sys.time()))
+cat(sprintf("## cycle ends: %s ##\n", Sys.time()))
 
 GOAL_deviance_est_wp <- do.call(rbind,boot_results_a1[,2])
-relative_wgt_list <- boot_results_a1[,3]
 ntrim <- as.data.frame(do.call(rbind,boot_results_a1[,1]))
 rownames(ntrim) <- paste("ntrim",exp_score,sep = "_")
 
-save(GOAL_deviance_est_wp,file = "GOAL_deviance_est_wp.Rdata")
-save(relative_wgt_list,file = "relative_wgt_list.Rdata")
-write.csv(ntrim,file = "ntrim_GOAL_deviance_wp.csv",quote = F)
+ess_decomp <- do.call(rbind,boot_results_a1[,3])
+smd_summary <- do.call(rbind,boot_results_a1[,4])
 
 
-
-final_res_est <- GOAL_deviance_est_wp[grepl("effect", row.names(GOAL_deviance_est_wp)),] 
-final_res_se <- GOAL_deviance_est_wp[grepl("se", row.names(GOAL_deviance_est_wp)),]
-final_res_p <- GOAL_deviance_est_wp[grepl("p-value", row.names(GOAL_deviance_est_wp)),]
-final_res_p
-
-final_res_se_mean <- rbind(final_res_se,colMeans(final_res_se,na.rm = T)) #忽略缺失值
-rownames(final_res_se_mean) <- c(rownames(final_res_se_mean)[1:11],"mean")
-
-write.csv(final_res_est,file = "final_res_est.csv",quote = F)
-write.csv(final_res_se_mean,file = "final_res_se_mean.csv",quote = F)
-write.csv(final_res_p,file = "final_res_p.csv",quote = F)
+save(GOAL_deviance_est_wp,file = "GOAL_deviance_est.Rdata")
+write.csv(ntrim,file = "ntrim_GOAL_deviance.csv",quote = F)
+save(ess_decomp_list,file = "GOAL_deviance_ess_decomp_list.Rdata")
+save(smd_summary_list,file = "GOAL_deviance_smd_summary.Rdata")
 
 
 
