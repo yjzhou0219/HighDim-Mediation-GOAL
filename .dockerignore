@@ -1,0 +1,9 @@
+.DS_Store
+**/.DS_Store
+R/.Rhistory
+R/.RData
+R/.Rproj.user
+R/renv/library
+R/renv/staging
+R/renv/python
+R/renv/cache
