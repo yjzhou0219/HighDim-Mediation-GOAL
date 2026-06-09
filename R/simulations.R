@@ -1,5 +1,7 @@
 source("GOAL_deviance.R")
 source("mediation_effect_continuous.R")
+source("bandwidth diagnostics.R")
+
 
 library(dplyr)
 library(stringr)
@@ -163,21 +165,64 @@ for (j in 1:length(a1_all_20)){
     res_list <- medweightcont(y = y, a = a, m = m, x_ax = X_ax, x_amx = X_amx, a0 = 0, a1 = a1_all_20[j], ATET = FALSE, 
                               trim = 0.05, lognorm = FALSE, bw = 2.34*(n^(-0.25))/2, boot = 500, cluster = NULL) 
     
+    ## estimation
     boot_res_ai <- as.data.frame(res_list$boot_results)
     rownames(boot_res_ai) <- paste(rownames(boot_res_ai), a1_all_20_char[j], sep = "_")
+    ntrim <- res_list$ntrimmed
     
     estiamtes_ai <- res_list$boot_results["Estimate",]
     low_CI_ai <- res_list$boot_results["CI_Lower",]
     upper_CI_ai <- res_list$boot_results["CI_Upper",]
-    
     is_covered <- ifelse(true_vals >= low_CI_ai & true_vals <= upper_CI_ai, 1, 0)
     
-    ntrim <- res_list$ntrimmed
+    ## diagnosis
+    wgt <- res_list$relative_wgt
+    kwgt <- res_list$kernel_wgt
+    ind <- res_list$ind
     
+    ### ESS ＆ CV
+    ess_a1m1 <- calc_ess_decomp(wgt$relative_wgt_a1m1, kwgt$kernel_wgt_a1)
+    ess_a1m0 <- calc_ess_decomp(wgt$relative_wgt_a1m0, kwgt$kernel_wgt_a1)
+    ess_a0m1 <- calc_ess_decomp(wgt$relative_wgt_a0m1, kwgt$kernel_wgt_a0)
+    ess_a0m0 <- calc_ess_decomp(wgt$relative_wgt_a0m0, kwgt$kernel_wgt_a0)
+    
+    ess_decomp <- t(cbind(ess_a1m1,ess_a1m0,ess_a0m1,ess_a0m0))
+    ess_decomp <- rbind(ess_decomp,colMeans(ess_decomp,na.rm = T))
+    rownames(ess_decomp) <- c(rownames(ess_decomp)[1:4],"mean")
+    rownames(ess_decomp) <- paste(rownames(ess_decomp), a1_all_20[j], sep = "_")
+    
+    ### SMD
+    x_ax_trimmed <- as.data.frame(X_ax[ind, , drop = FALSE])
+    x_amx_trimmed <- as.data.frame(X_amx[ind, , drop = FALSE])
+    x_union <- as.data.frame(cbind(x_ax_trimmed,x_amx_trimmed[, setdiff(colnames(x_amx_trimmed), colnames(x_ax_trimmed)), drop = FALSE]))
+    
+    smd_a1m1 <- calc_smd(x_ax_trimmed, wgt$relative_wgt_a1m1)
+    smd_a0m0 <- calc_smd(x_ax_trimmed, wgt$relative_wgt_a0m0)
+    smd_a1m0 <- calc_smd(x_union, wgt$relative_wgt_a1m0)
+    smd_a0m1 <- calc_smd(x_union, wgt$relative_wgt_a0m1)
+    
+    smd_summary <- data.frame(
+      max_abs_smd = c(
+        max(smd_a1m1, na.rm = TRUE),
+        max(smd_a1m0, na.rm = TRUE),
+        max(smd_a0m1, na.rm = TRUE),
+        max(smd_a0m0, na.rm = TRUE)
+      ),
+      mean_abs_smd = c(
+        mean(smd_a1m1, na.rm = TRUE),
+        mean(smd_a1m0, na.rm = TRUE),
+        mean(smd_a0m1, na.rm = TRUE),
+        mean(smd_a0m0, na.rm = TRUE)
+      )
+    )
+    rownames(smd_summary) <- paste(c("a1m1", "a1m0", "a0m1", "a0m0"), a1_all_20[j], sep = "_")
+
     list(
       ntrim=ntrim,
       boot_res_ai=boot_res_ai,
-      is_covered=is_covered
+      is_covered=is_covered,
+      ess_decomp=ess_decomp,
+      smd_summary=smd_summary
       )
     
   }
@@ -193,9 +238,13 @@ for (j in 1:length(a1_all_20)){
   colnames(ntrim) <- paste("ntrim",a1_all_20_char[j],sep = "_")
   ntrim_df_GOAL_S1 <- cbind(ntrim_df_GOAL_S1,ntrim)
   
+  ess_decomp_list[[j]] <- do.call(rbind,boot_results_a1[,4])
+  smd_summary_list[[j]] <- do.call(rbind,boot_results_a1[,5])
+  
   cat(sprintf("#################### a1 = %s cycle ends. \n", a1_all_20[j]))
   
 }
+
 
 save(sim_res_GOAL_S1,file = "S1_sost_sim_res_GOAL.Rdata")
 ntrim_df_GOAL_S1 <- ntrim_df_GOAL_S1[,-1]
@@ -206,11 +255,8 @@ coverage_df <- rbind(coverage_df,colMeans(coverage_df,na.rm = T))
 rownames(coverage_df) <- c(rownames(coverage_df)[1:nrow(coverage_df)-1],"CP")
 save(coverage_df,file = "coverage_df_S1_COAL.Rdata")
 
-
-
-
-
-
+save(ess_decomp_list,file = "S1_sost_ess_decomp_list_GOAL.Rdata")
+save(smd_summary_list,file = "S1_sost_smd_summary_GOAL.Rdata")
 
 
 
