@@ -66,7 +66,7 @@ renv::restore(project = getwd(), prompt = FALSE)
 #### **Note on `lqa` package**: 
 The `lqa` package is required for GOAL but may **not be** directly available via `install.packages("lqa")` in recent versions of R. We have included the source file `lqa_1.0-3.tar.gz` in `R/renv/local/` of this repository. 
 
-- If you are using **Method 1** (Manual Setup), the `lqa` can be directly installed by setp 4:
+- If you are using **Method 1** (Manual Setup), the `lqa` can be directly installed by step 4:
 	```r
    # Set the working directory or Clone the repository and open the `R/R.Rproj` project in RStudio
    setwd("path/to/HighDim-Mediation-GOAL/R")
