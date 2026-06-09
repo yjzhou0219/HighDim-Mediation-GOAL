@@ -1,17 +1,15 @@
 
-# -------------------------------------
 # Install packages if necessary (uncomment to run)
 
-#install.packages("remotes")
-#install.packages("devtools")
-#install.packages("MASS")
-#install.packages("stats")
-#install.packages("car")
-#install.packages("dplyr")
-#remotes::install_github("strengejacke/sjstats")
-#remotes::install_github("JeffreyRacine/R-Package-np")
+# install.packages("remotes")
+# install.packages("devtools")
+# install.packages("MASS")
+# install.packages("stats")
+# install.packages("car")
+# install.packages("dplyr")
+# remotes::install_github("strengejacke/sjstats")
+# remotes::install_github("JeffreyRacine/R-Package-np")
 
-# -------------------------------------
 
 
 library(remotes)
@@ -75,6 +73,11 @@ mediation.cont<-function(y,a,m,x_ax,x_amx,a0,a1,ATET=FALSE,trim=0.05,lognorm=FAL
   y=y[ind];  pscore1a0=pscore1a0[ind];pscore1a1=pscore1a1[ind];pscore2a0=pscore2a0[ind]; pscore2a1=pscore2a1[ind];
   kernwgta0=kernwgta0[ind]; kernwgta1= kernwgta1[ind];
   
+  kernel_wgt <- data.frame(
+    kernel_wgt_a1 = kernwgta0,
+    kernel_wgt_a0 = kernwgta1
+  )
+  
   if (ATET==FALSE){
     ya1m1=sum(y*kernwgta1/pscore1a1)/sum(kernwgta1/pscore1a1)
     ya1m0=sum(y*kernwgta1*pscore2a0/(pscore2a1*pscore1a0))/sum(kernwgta1*pscore2a0/(pscore2a1*pscore1a0))
@@ -103,7 +106,9 @@ mediation.cont<-function(y,a,m,x_ax,x_amx,a0,a1,ATET=FALSE,trim=0.05,lognorm=FAL
   results <- list(
     # return average total effect, natural direct effect under treatment and non-treatment, natural indirect effect under treatment and non-treatment, and the number of abnormal GPS values
     effect=c(ya1m1-ya0m0, ya1m1-ya0m1, ya1m0-ya0m0, ya1m1-ya1m0, ya0m1-ya0m0, sum(1-ind)),
-    relative_wgt=relative_wgt
+    relative_wgt=relative_wgt,
+    kernel_wgt=kernel_wgt,
+    ind=ind
     ) 
   
   return(results)
@@ -273,19 +278,12 @@ medweightcont<-function(y,a,m,x_ax,x_amx,a0,a1,ATET=FALSE,trim=0.05,lognorm=FALS
   res_list <- list(
     boot_results=results_summary,
     ntrimmed=ntrimmed,
-    relative_wgt=as.data.frame(mediation_cont_res$relative_wgt)
+    relative_wgt=as.data.frame(mediation_cont_res$relative_wgt),
+    kernel_wgt = as.data.frame(mediation_cont_res$kernel_wgt),
+    ind=mediation_cont_res$ind
   )
   return(res_list)
 }
-
-
-
-
-
-
-
-
-  
 
 
 
