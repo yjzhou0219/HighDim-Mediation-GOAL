@@ -41,7 +41,7 @@ This repository includes a `renv` configuration to help you recreate the exact d
 
 ```r
 # Step 1: Prepare the Project
-# Clone the repository, then set the working directory to the 'R' folder, or Clone the repository and open the project in RStudio
+# Clone the repository, then set the working directory to the 'R' folder (or Clone the repository and open the `R/R.Rproj` project in RStudio)
 setwd("path/to/HighDim-Mediation-GOAL/R")
 
 # Step 2: Initialize 'renv'. Ensure the renv package is installed on your system.
@@ -68,10 +68,10 @@ The `lqa` package is required for GOAL but may **not be** directly available via
 
 - If you are using **Method 1** (Manual Setup), the `lqa` can be directly installed by setp 4:
 	```r
-   # set the working directory
+   # Set the working directory or Clone the repository and open the `R/R.Rproj` project in RStudio
    setwd("path/to/HighDim-Mediation-GOAL/R")
 
-   # install from the local source file
+   # Install from the local source file
    install.packages("renv/local/lqa_1.0-3.tar.gz", repos = NULL, type = "source")
 
    # Check lqa installation
