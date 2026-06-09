@@ -119,10 +119,11 @@ All source code for the proposed method and simulation studies is located in the
 
 * **`GOAL_deviance.R`**: Contains the implementation of the Generalized Outcome-Adaptive Lasso (GOAL) algorithm for high-dimensional variable selection.
 * **`mediation_effect_continuous.R`**: Contains the core function for the IPW-based semi-parametric estimator, specifically designed for continuous exposures and mediators.
+* **`bandwidth diagnostics.R`**: Contains the core function for bandwidth diagnostic analysis, specifically involving the calculation of effective sample size (ESS), coefficient of variation (CV), and standardized mean differences (SMD).
 * **`simulation.R`**: The main script to reproduce the simulation studies. It demonstrates how to generate data and apply the proposed estimator by calling the necessary functions from the aforementioned files.
 * **`PLM-DML_functions+simulations.R`**: Contains the core estimation functions and the simulation script for the Double Machine Learning (DML) method based on the partially linear mediation model structure and LASSO algorithm. It demonstrates the implementation of the DML-LASSO framework used for performance comparison in our study.
 * **`real-data analysis.R`**: The simple simplified demonstration script that outlines the data processing and analysis for the real-data application in this manuscript.
-* **`plotting_Figs1-5.R`**: The plotting script for the core figures (Figures 1-5) presented in this manuscript.
+* **`plotting_Figs1-7.R`**: The plotting script for the core figures (Figures 1-7) presented in this manuscript.
 
 You can copy and run the following R script to install all dependencies (including CRAN packages and specific GitHub repositories):
 
