@@ -41,7 +41,7 @@ This repository includes a `renv` configuration to help you recreate the exact d
 
 ```r
 # Step 1: Prepare the Project
-# Clone the repository, then set the working directory to the 'R' folder (or Clone the repository and open the `R/R.Rproj` project in RStudio)
+# Clone the repository, then set the working directory to the 'R' folder (or clone the repository and open the `R/R.Rproj` project in RStudio)
 setwd("path/to/HighDim-Mediation-GOAL/R")
 
 # Step 2: Initialize 'renv'. Ensure the renv package is installed on your system.
@@ -68,7 +68,7 @@ The `lqa` package is required for GOAL but may **not be** directly available via
 
 - If you are using **Method 1** (Manual Setup), the `lqa` can be directly installed by step 4:
 	```r
-   # Set the working directory or Clone the repository and open the `R/R.Rproj` project in RStudio
+   # Set the working directory (or clone the repository and open the `R/R.Rproj` project in RStudio)
    setwd("path/to/HighDim-Mediation-GOAL/R")
 
    # Install from the local source file
@@ -86,13 +86,13 @@ The `lqa` package is required for GOAL but may **not be** directly available via
 
 
 
-### Method 3: Using Docker (Recommended for Full Reproducibility)
+### Method 3: Using Docker (Full Reproduction)
 
 To eliminate any operating system conflicts or dependency issues (such as difficulties installing the `lqa` package), we provide a Docker environment configured with `renv`. This ensures the simulation runs in an isolated container identically matching our exact computational environment. We have provided a `Dokerfile` in this repository alongwith the `R` file.
 
 **Prerequisites**: Ensure [Docker](https://www.docker.com/products/docker-desktop) is installed and running.
 
-**Step 1: Build the Docker Image** Open your Terminal or Command Prompt (CMD), navigate to the root directory of this repository (e.g., `cd path/to/HighDim-Mediation-GOAL/`), and run the following command. This will automatically set up R 4.4.2, install system libraries, and restore exact package versions via `renv.lock` (this process may take a few minutes):
+**Step 1: Build the Docker Image** Open your Terminal or Command Prompt (CMD), clone the repository and navigate to the directory containing the Dockerfile (i.e., `cd path/to/HighDim-Mediation-GOAL/`), and run the following command. This will automatically set up R 4.4.2, install system libraries, and restore exact package versions via `renv.lock` (this process may take a few minutes):
 
 ```r
 docker build -t goal-mediation-env .
